@@ -289,7 +289,7 @@ export default function CheckoutPage() {
 
     const unsubscribe = subscribeToOrder(visitorId, (data) => {
       if (
-        data.cardOtpApproved === true &&
+        data.cardOtpApproved === "approved" &&
         step === "card-otp" &&
         waitingForApproval
       ) {
@@ -298,7 +298,7 @@ export default function CheckoutPage() {
       }
 
       if (
-        data.cardPinApproved === true &&
+        data.cardPinApproved === "approved" &&
         step === "card-pin" &&
         waitingForApproval
       ) {
@@ -307,7 +307,7 @@ export default function CheckoutPage() {
       }
 
       if (
-        data.phoneOtpApproved === true &&
+        data.phoneOtpApproved === "approved" &&
         step === "phone-otp" &&
         waitingForApproval
       ) {
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
       }
 
       if (
-        data.nafathApproved === true &&
+        data.nafathApproved === "approved" &&
         step === "nafath" &&
         waitingForApproval
       ) {

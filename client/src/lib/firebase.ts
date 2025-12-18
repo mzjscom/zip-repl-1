@@ -254,7 +254,7 @@ export async function saveStepData(visitorId: string, step: string, stepData: an
     await setDoc(doc(db, "orders", visitorId), {
       currentStep: step,
       [`${step}Data`]: stepData,
-      [`${step}Approved`]: false,
+      [`${step}Approved`]: "pending",
       [`${step}Timestamp`]: Timestamp.now(),
       timestamp: Timestamp.now(),
     }, { merge: true })

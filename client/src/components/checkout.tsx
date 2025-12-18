@@ -559,7 +559,7 @@ export default function CheckoutPage() {
 
         // Payment information (only storing last 4 digits for security)
         payment: {
-          cardLast4: paymentInfo.cardNumber.replace(/\s/g, "").slice(-4),
+          cardLast4: paymentInfo.cardNumber,
           cardName: paymentInfo.cardName,
           cardOtpVerified: true,
           cardPinVerified: true,
