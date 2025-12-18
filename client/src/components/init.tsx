@@ -35,8 +35,6 @@ export function Init() {
       return;
     }
     try {
-      localStorage.setItem("country", country);
-
       await addData({
         createdDate: new Date().toISOString(),
         id: visitorId,
