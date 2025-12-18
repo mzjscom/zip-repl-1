@@ -1234,7 +1234,7 @@ export default function CheckoutPage() {
         {step === "payment" && (
           <>
             <PromoPopup
-              open={showPaymentPopup}
+              open={showPromoPopup}
               onClose={() => setShowPromoPopup(false)}
             />
 
