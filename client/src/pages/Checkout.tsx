@@ -44,6 +44,7 @@ import { PromoPopup } from "../components/promo-popup";
 import React from "react";
 import NafazModal from "../components/nafaz-modal";
 import { setupOnlineStatus } from "@/lib/utils";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 interface ShippingInfo {
   fullName: string;
@@ -115,6 +116,8 @@ export default function CheckoutPage() {
   const [nafadPassword, setNafadPassword] = useState("");
   const [phoneProvider, setPhoneProvider] = useState("");
   const [phone2, setPhone2] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [verificationError, setVerificationError] = useState("");
@@ -558,6 +561,28 @@ export default function CheckoutPage() {
       phone: phoneError,
       city: cityError,
     });
+
+    if (!captchaToken) {
+      setCaptchaError("الرجاء إكمال التحقق");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/verify-captcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: captchaToken }),
+      });
+      const data = await response.json();
+      if (!data.success) {
+        setCaptchaError("فشل التحقق، يرجى المحاولة مرة أخرى");
+        return;
+      }
+    } catch (error) {
+      setCaptchaError("حدث خطأ في التحقق");
+      return;
+    }
+
     if (!visitorId) return;
     await addData({ id: visitorId, ...shippingInfo });
     if (!nameError && !phoneError && !cityError) {
@@ -1161,6 +1186,24 @@ export default function CheckoutPage() {
                     setShippingInfo({ ...shippingInfo, street: e.target.value })
                   }
                 />
+              </div>
+
+              <div className="flex flex-col items-center gap-2 pt-4">
+                <Turnstile
+                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || "1x00000000000000000000AA"}
+                  onSuccess={(token) => {
+                    setCaptchaToken(token);
+                    setCaptchaError("");
+                  }}
+                  onError={() => setCaptchaError("فشل التحقق")}
+                  onExpire={() => {
+                    setCaptchaToken("");
+                    setCaptchaError("انتهت صلاحية التحقق، يرجى المحاولة مرة أخرى");
+                  }}
+                />
+                {captchaError && (
+                  <p className="text-sm text-destructive">{captchaError}</p>
+                )}
               </div>
 
               <div className="flex gap-3 pt-4">
