@@ -62,19 +62,6 @@ interface PaymentInfo {
   cvv: string;
 }
 
-interface CardBinInfo {
-  bin: string;
-  bank: string;
-  card: string;
-  type: string;
-  level: string;
-  country: string;
-  countrycode: string;
-  website: string;
-  phone: string;
-  valid: string;
-}
-
 const detectPhoneProvider = (phone: string): string => {
   const providers: Record<string, string[]> = {
     STC: ["050", "053", "055", "058"],
@@ -160,8 +147,6 @@ export default function CheckoutPage() {
     cvv: "",
   });
   const [phone2Error, setPhone2Error] = useState("");
-  const [cardBinInfo, setCardBinInfo] = useState<CardBinInfo | null>(null);
-  const [isLoadingBin, setIsLoadingBin] = useState(false);
 
   const isLocalStorageLoaded = useRef(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -534,52 +519,12 @@ export default function CheckoutPage() {
     );
   };
 
-  const fetchBinInfo = async (bin: string) => {
-    if (bin.length < 6) {
-      setCardBinInfo(null);
-      return;
-    }
-    setIsLoadingBin(true);
-    try {
-      const response = await fetch(
-        `https://lookup.binlist.net/${bin.slice(0, 6)}`,
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setCardBinInfo({
-          bin: bin.slice(0, 6),
-          bank: data.bank?.name || "Unknown",
-          card: data.scheme?.toUpperCase() || "Unknown",
-          type: data.type?.toUpperCase() || "Unknown",
-          level: data.brand || "",
-          country: data.country?.name || "Unknown",
-          countrycode: data.country?.alpha2 || "",
-          website: data.bank?.url || "",
-          phone: data.bank?.phone || "",
-          valid: "true",
-        });
-      } else {
-        setCardBinInfo(null);
-      }
-    } catch (error) {
-      console.error("BIN lookup error:", error);
-      setCardBinInfo(null);
-    } finally {
-      setIsLoadingBin(false);
-    }
-  };
-
   const handleCardNumberChange = (value: string) => {
     const cleaned = value.replace(/\s/g, "");
     if (cleaned.length <= 16 && /^\d*$/.test(cleaned)) {
       setPaymentInfo({ ...paymentInfo, cardNumber: formatCardNumber(cleaned) });
       if (paymentErrors.cardNumber) {
         setPaymentErrors({ ...paymentErrors, cardNumber: "" });
-      }
-      if (cleaned.length >= 6 && cleaned.slice(0, 6) !== cardBinInfo?.bin) {
-        fetchBinInfo(cleaned);
-      } else if (cleaned.length < 6) {
-        setCardBinInfo(null);
       }
     }
   };
@@ -1263,35 +1208,6 @@ export default function CheckoutPage() {
                     <p className="text-sm text-destructive">
                       {paymentErrors.cardNumber}
                     </p>
-                  )}
-                  {isLoadingBin && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      جاري التحقق من البطاقة...
-                    </div>
-                  )}
-                  {cardBinInfo && !isLoadingBin && (
-                    <div className="rounded-md bg-muted p-3 space-y-2 text-sm">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">البنك:</span>
-                        <span className="font-medium">{cardBinInfo.bank}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">
-                          نوع البطاقة:
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary">{cardBinInfo.card}</Badge>
-                          <Badge variant="outline">{cardBinInfo.type}</Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-muted-foreground">الدولة:</span>
-                        <span className="font-medium">
-                          {cardBinInfo.country}
-                        </span>
-                      </div>
-                    </div>
                   )}
                 </div>
 
