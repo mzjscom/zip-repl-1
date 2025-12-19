@@ -107,7 +107,7 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, error: "Token is required" });
       }
 
-      const secretKey = process.env.TURNSTILE_SECRET_KEY;
+      const secretKey = "0x4AAAAAACHfmoS-WNoTg9lcD74ZLPcvxzg";
       if (!secretKey) {
         console.warn("TURNSTILE_SECRET_KEY not configured, allowing request");
         return res.json({ success: true });
