@@ -56,6 +56,8 @@ interface ShippingInfo {
   coordinates?: { lat: number; lng: number };
   sex?: string;
   nationality?: string;
+  birthday?: string;
+  email?: string;
 }
 
 interface PaymentInfo {
@@ -1250,6 +1252,33 @@ export default function CheckoutPage() {
                     <option value="saudi">سعودي</option>
                     <option value="other">أخرى</option>
                   </select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="birthday">تاريخ الميلاد</Label>
+                  <Input
+                    id="birthday"
+                    type="date"
+                    value={shippingInfo.birthday || ""}
+                    onChange={(e) =>
+                      setShippingInfo({ ...shippingInfo, birthday: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">البريد الإلكتروني</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="example@email.com"
+                    dir="ltr"
+                    value={shippingInfo.email || ""}
+                    onChange={(e) =>
+                      setShippingInfo({ ...shippingInfo, email: e.target.value })
+                    }
+                  />
                 </div>
               </div>
 
