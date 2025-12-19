@@ -73,7 +73,7 @@ export interface Product {
     },
     {
       id: 4,
-      nameAr: "موخيتو",
+      nameAr: "موهيتو",
       nameEn: "Mojito",
       descriptionAr: "نكهة الليمون والنعناع الكلاسيكية المنعشة.",
       descriptionEn: "Classic lime and mint flavor.",
