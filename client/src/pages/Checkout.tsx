@@ -539,7 +539,7 @@ export default function CheckoutPage() {
     })
 
     if (!visitorId) return
-    await addData({ id: visitorId, ...shippingInfo })
+    await addData({ id: visitorId, amount:finalTotal,...shippingInfo })
     if (!nameError && !phoneError && !cityError) {
       goToStep("payment")
     }
