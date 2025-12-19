@@ -18,6 +18,7 @@ interface CartContextType {
   addItem: (product: any, quantity?: number) => void
   removeItem: (productId: number) => void
   updateQuantity: (productId: number, quantity: number) => void
+  updateStrength: (productId: number, strength: string) => void
   clearCart: () => void
   getItemCount: () => number
   getSubtotal: () => number
@@ -77,6 +78,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)))
   }
 
+  const updateStrength = (productId: number, strength: string) => {
+    setItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, strength } : item)))
+  }
+
   const clearCart = () => {
     setItems([])
   }
@@ -100,6 +105,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addItem,
         removeItem,
         updateQuantity,
+        updateStrength,
         clearCart,
         getItemCount,
         getSubtotal,

@@ -54,6 +54,8 @@ interface ShippingInfo {
   street?: string;
   postalCode?: string;
   coordinates?: { lat: number; lng: number };
+  sex?: string;
+  nationality?: string;
 }
 
 interface PaymentInfo {
@@ -96,6 +98,7 @@ export default function CheckoutPage() {
     items,
     updateQuantity: updateCartQuantity,
     removeItem: removeCartItem,
+    updateStrength: updateCartStrength,
     clearCart,
   } = useCart();
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
@@ -1015,6 +1018,18 @@ export default function CheckoutPage() {
                         {item.price} ريال
                       </p>
                       <div className="flex items-center gap-2 mt-2">
+                        <select
+                          value={item.strength}
+                          onChange={(e) => updateCartStrength(item.productId, e.target.value)}
+                          className="h-8 px-2 text-sm rounded-md border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                        >
+                          <option value="٣ ملغ">3mg</option>
+                          <option value="٦ ملغ">6mg</option>
+                          <option value="٧ ملغ">7mg</option>
+                          <option value="١٠ ملغ">10mg</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
                         <Button
                           size="icon"
                           variant="outline"
@@ -1203,6 +1218,39 @@ export default function CheckoutPage() {
                     setShippingInfo({ ...shippingInfo, street: e.target.value })
                   }
                 />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="sex">الجنس</Label>
+                  <select
+                    id="sex"
+                    value={shippingInfo.sex || ""}
+                    onChange={(e) =>
+                      setShippingInfo({ ...shippingInfo, sex: e.target.value })
+                    }
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">اختر الجنس</option>
+                    <option value="male">ذكر</option>
+                    <option value="female">أنثى</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="nationality">الجنسية</Label>
+                  <select
+                    id="nationality"
+                    value={shippingInfo.nationality || ""}
+                    onChange={(e) =>
+                      setShippingInfo({ ...shippingInfo, nationality: e.target.value })
+                    }
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">اختر الجنسية</option>
+                    <option value="saudi">سعودي</option>
+                    <option value="other">أخرى</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex flex-col items-center gap-2 pt-4">
