@@ -575,7 +575,6 @@ export default function CheckoutPage() {
     }
 
     if (!phoneError) {
-      sendPhoneOtp()
     }
   }
 
@@ -1287,9 +1286,7 @@ export default function CheckoutPage() {
 
               <div className="text-center text-sm text-muted-foreground">
                 {canResendOtp ? (
-                  <button onClick={handleResendOtp} className="text-primary hover:underline font-medium">
-                    إعادة إرسال الرمز
-                  </button>
+                <></>
                 ) : (
                   <span>يمكنك إعادة الإرسال بعد {resendTimer} ثانية</span>
                 )}
