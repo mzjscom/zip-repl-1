@@ -48,7 +48,7 @@ export function PromoPopup({ open, onClose }: PromoPopupProps) {
             <div className="text-white text-lg sm:text-xl mb-2" dir="rtl">
               إسترداد نقدي
             </div>
-            <div className="text-orange-500 text-5xl sm:text-7xl font-black mb-2">30%</div>
+            <div className="text-orange-500 text-5xl sm:text-7xl font-black mb-2">10%</div>
             <div className="text-white text-xs sm:text-sm" dir="rtl">
               عند استخدامك البطاقات الائتمانية التالية
             </div>
