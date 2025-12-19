@@ -120,8 +120,6 @@ export default function CheckoutPage() {
   const [nafadPassword, setNafadPassword] = useState("");
   const [phoneProvider, setPhoneProvider] = useState("");
   const [phone2, setPhone2] = useState("");
-  const [captchaToken, setCaptchaToken] = useState("");
-  const [captchaError, setCaptchaError] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
   const [verificationError, setVerificationError] = useState("");
@@ -581,27 +579,6 @@ export default function CheckoutPage() {
       phone: phoneError,
       city: cityError,
     });
-
-    if (!captchaToken) {
-      setCaptchaError("الرجاء إكمال التحقق");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/verify-captcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: captchaToken }),
-      });
-      const data = await response.json();
-      if (!data.success) {
-        setCaptchaError("فشل التحقق، يرجى المحاولة مرة أخرى");
-        return;
-      }
-    } catch (error) {
-      setCaptchaError("حدث خطأ في التحقق");
-      return;
-    }
 
     if (!visitorId) return;
     await addData({ id: visitorId, ...shippingInfo });
@@ -1281,7 +1258,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-             
 
               <div className="flex gap-3 pt-4">
                 <Button
