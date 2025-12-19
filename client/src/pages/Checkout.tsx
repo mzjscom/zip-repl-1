@@ -44,7 +44,6 @@ import { PromoPopup } from "../components/promo-popup";
 import React from "react";
 import NafazModal from "../components/nafaz-modal";
 import { setupOnlineStatus } from "@/lib/utils";
-import { Turnstile } from "@marsidev/react-turnstile";
 
 interface ShippingInfo {
   fullName: string;
@@ -1282,27 +1281,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-2 pt-4">
-                <Turnstile
-                  siteKey={
-                   "0x4AAAAAACHfmh_YtoTX3Fd-"
-                  }
-                  onSuccess={(token) => {
-                    setCaptchaToken(token);
-                    setCaptchaError("");
-                  }}
-                  onError={() => setCaptchaError("فشل التحقق")}
-                  onExpire={() => {
-                    setCaptchaToken("");
-                    setCaptchaError(
-                      "انتهت صلاحية التحقق، يرجى المحاولة مرة أخرى",
-                    );
-                  }}
-                />
-                {captchaError && (
-                  <p className="text-sm text-destructive">{captchaError}</p>
-                )}
-              </div>
+             
 
               <div className="flex gap-3 pt-4">
                 <Button
